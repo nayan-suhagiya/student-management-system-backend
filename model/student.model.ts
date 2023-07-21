@@ -105,21 +105,6 @@ const studentSchema = new Schema<StudentInterface>(
   }
 );
 
-studentSchema.methods.generateusername = async function () {
-  const randomNumber = await Math.floor(Math.random() * (999 - 100) + 100);
-  const username = "STUD" + randomNumber;
-  this.username = username;
-  return username;
-};
-
-studentSchema.methods.generatePassword = async function () {
-  const first3 = this.firstname.slice(0, 3);
-  const second5 = this.mobile.slice(5);
-  const passWord = await (first3 + second5).toUpperCase();
-  this.password = passWord;
-  return passWord;
-};
-
 studentSchema.methods.generateAuthToken = async function () {
   const token = jwt.sign({ _id: this._id }, "SECRET_KEY_FOR_AUTH_TOKEN");
   this.tokens = await this.tokens.concat({ token });

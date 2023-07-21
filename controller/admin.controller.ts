@@ -7,11 +7,16 @@ let responseModel = new ResponseModel();
 const addStudent = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-    const stud: any = new studentModel(data);
 
-    const username = await stud.generateusername();
-    const password = await stud.generatePassword();
+    const username = await generateUsername();
+    const password = await generatePassword(data.firstname, data.mobile);
 
+    data.username = username;
+    data.password = password;
+    console.log(data);
+    const stud = new studentModel(data);
+
+    // await stud.save();
     await stud.save();
 
     responseModel.message = "Student data added!";
@@ -26,6 +31,21 @@ const addStudent = async (req: Request, res: Response) => {
 
     res.status(400).send(responseModel);
   }
+};
+
+const generateUsername = () => {
+  const randomNumber = Math.floor(Math.random() * (999 - 100) + 100);
+  const username = "STUD" + randomNumber;
+  // this.username = username;
+  return username;
+};
+
+const generatePassword = (firstname, mobile) => {
+  const first3 = firstname.slice(0, 3);
+  const second5 = mobile.slice(5);
+  const passWord = (first3 + second5).toUpperCase();
+  // this.password = passWord;
+  return passWord;
 };
 
 const getAllStudentData = async (req: Request, res: Response) => {
