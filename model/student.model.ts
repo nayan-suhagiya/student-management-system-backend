@@ -1,8 +1,9 @@
 import { Schema, model } from "mongoose";
 import validator from "validator";
+import jwt from "jsonwebtoken";
 
 interface StudentInterface {
-  studid: string;
+  username: string;
   firstname: string;
   middlename: string;
   surname: string;
@@ -20,7 +21,7 @@ interface StudentInterface {
 
 const studentSchema = new Schema<StudentInterface>(
   {
-    studid: {
+    username: {
       type: String,
       required: true,
       minlength: 7,
@@ -104,11 +105,11 @@ const studentSchema = new Schema<StudentInterface>(
   }
 );
 
-studentSchema.methods.generateStudId = async function () {
+studentSchema.methods.generateusername = async function () {
   const randomNumber = await Math.floor(Math.random() * (999 - 100) + 100);
-  const studId = "STUD" + randomNumber;
-  this.studid = studId;
-  return studId;
+  const username = "STUD" + randomNumber;
+  this.username = username;
+  return username;
 };
 
 studentSchema.methods.generatePassword = async function () {
@@ -117,6 +118,13 @@ studentSchema.methods.generatePassword = async function () {
   const passWord = await (first3 + second5).toUpperCase();
   this.password = passWord;
   return passWord;
+};
+
+studentSchema.methods.generateAuthToken = async function () {
+  const token = jwt.sign({ _id: this._id }, "SECRET_KEY_FOR_AUTH_TOKEN");
+  this.tokens = await this.tokens.concat({ token });
+  await this.save();
+  return token;
 };
 
 const studentModel = model<StudentInterface>("student", studentSchema);

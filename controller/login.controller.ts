@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ResponseModel } from "../model/respose.model";
 import { adminModel } from "../model/admin.model";
+import { studentModel } from "../model/student.model";
 
 let responseModel = new ResponseModel();
 
@@ -11,7 +12,7 @@ const loginUser = async (req: Request, res: Response) => {
 
     if (data.username == "" || !data.username) {
       responseModel.message = "Please provide username";
-      responseModel.status = 400;
+      responseModel.status = false;
       responseModel.data = [];
 
       res.status(400).send(responseModel);
@@ -23,7 +24,7 @@ const loginUser = async (req: Request, res: Response) => {
 
       if (user?.password !== data.password) {
         responseModel.message = "Please check your password";
-        responseModel.status = 400;
+        responseModel.status = false;
         responseModel.data = [];
 
         res.status(200).send(responseModel);
@@ -34,26 +35,58 @@ const loginUser = async (req: Request, res: Response) => {
       // console.log(token);
 
       responseModel.message = "Login success!";
-      responseModel.status = 200;
+      responseModel.status = true;
       responseModel.data = [
         {
           _id: user._id,
           username: user.username,
           token,
+          isAdmin: true,
         },
       ];
 
       res.status(200).send(responseModel);
     } else {
-      responseModel.message = "Student side login";
-      responseModel.status = 200;
-      responseModel.data = [];
+      const user: any = await studentModel.findOne({ username: data.username });
+
+      // res.send(user);
+      if (!user) {
+        responseModel.message = "Unable to found user!";
+        responseModel.status = false;
+        responseModel.data = [];
+
+        res.status(404).send(responseModel);
+        return;
+      }
+
+      if (user?.password !== data.password) {
+        responseModel.message = "Please check your password";
+        responseModel.status = false;
+        responseModel.data = [];
+
+        res.status(200).send(responseModel);
+        return;
+      }
+
+      const token = await user.generateAuthToken();
+      // console.log(token);
+
+      responseModel.message = "Login success!";
+      responseModel.status = true;
+      responseModel.data = [
+        {
+          _id: user._id,
+          username: user.username,
+          token,
+          isAdmin: false,
+        },
+      ];
 
       res.status(200).send(responseModel);
     }
   } catch (error) {
     responseModel.message = "Unable to login";
-    responseModel.status = 400;
+    responseModel.status = false;
     responseModel.data = [{ error }];
 
     res.status(400).send(responseModel);
@@ -70,13 +103,13 @@ const logoutUser = async (req, res) => {
     await req.user.save();
 
     responseModel.message = "Logout Success";
-    responseModel.status = 200;
+    responseModel.status = true;
     responseModel.data = [];
 
     res.status(200).send(responseModel);
   } catch (error) {
     responseModel.message = "Unable to logout";
-    responseModel.status = 400;
+    responseModel.status = false;
     responseModel.data = [{ error }];
 
     res.status(400).send(responseModel);
@@ -90,13 +123,13 @@ const logoutFromAll = async (req, res) => {
     await req.user.save();
 
     responseModel.message = "Logout successfully from all devices";
-    responseModel.status = 200;
+    responseModel.status = true;
     responseModel.data = [];
 
     res.status(200).send(responseModel);
   } catch (error) {
     responseModel.message = "Unable to logout";
-    responseModel.status = 400;
+    responseModel.status = false;
     responseModel.data = [{ error }];
 
     res.status(400).send(responseModel);
