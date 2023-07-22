@@ -6,28 +6,26 @@ let responseModel = new ResponseModel();
 
 const addStudent = async (req: Request, res: Response) => {
   try {
-    const data = req.body;
+    const studentData = req.body;
+    studentData.username = generateUsername();
+    studentData.password = generatePassword(
+      studentData.firstname,
+      studentData.mobile
+    );
 
-    const username = await generateUsername();
-    const password = await generatePassword(data.firstname, data.mobile);
+    const student = new studentModel(studentData);
 
-    data.username = username;
-    data.password = password;
-    console.log(data);
-    const stud = new studentModel(data);
+    await student.save();
 
-    // await stud.save();
-    await stud.save();
-
-    responseModel.message = "Student data added!";
+    responseModel.message = "Student added!";
     responseModel.status = true;
-    responseModel.data = [stud];
+    responseModel.data = [student];
 
     res.status(200).send(responseModel);
   } catch (error) {
     responseModel.message = "Unable to add!";
     responseModel.status = false;
-    responseModel.data = [{ error }];
+    responseModel.data = [error];
 
     res.status(400).send(responseModel);
   }
@@ -36,7 +34,6 @@ const addStudent = async (req: Request, res: Response) => {
 const generateUsername = () => {
   const randomNumber = Math.floor(Math.random() * (999 - 100) + 100);
   const username = "STUD" + randomNumber;
-  // this.username = username;
   return username;
 };
 
@@ -44,7 +41,6 @@ const generatePassword = (firstname, mobile) => {
   const first3 = firstname.slice(0, 3);
   const second5 = mobile.slice(5);
   const passWord = (first3 + second5).toUpperCase();
-  // this.password = passWord;
   return passWord;
 };
 
@@ -82,6 +78,8 @@ const updateStudent = async (req: Request, res: Response) => {
       return;
     }
 
+    data.password = generatePassword(data.firstname, data.mobile);
+
     const stud: any = await studentModel.findOneAndUpdate(
       {
         username: data.username,
@@ -103,4 +101,24 @@ const updateStudent = async (req: Request, res: Response) => {
   }
 };
 
-export { addStudent, getAllStudentData, updateStudent };
+const deleteStudent = async (req: Request, res: Response) => {
+  try {
+    const username = req.params.username;
+
+    await studentModel.findOneAndDelete({ username });
+
+    responseModel.message = "Student deleted!";
+    responseModel.status = true;
+    responseModel.data = [];
+
+    res.status(200).send(responseModel);
+  } catch (error) {
+    responseModel.message = "Unable to delete!";
+    responseModel.status = false;
+    responseModel.data = [{ error }];
+
+    res.status(400).send(responseModel);
+  }
+};
+
+export { addStudent, getAllStudentData, updateStudent, deleteStudent };
