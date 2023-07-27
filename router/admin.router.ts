@@ -10,7 +10,7 @@ const adminRouter = express.Router();
 
 adminRouter.post("/admin/add-student-data", auth, addStudent);
 adminRouter.get("/admin/get-all-student-data", auth, getAllStudentData);
-adminRouter.patch("/admin/update-student-data", auth, updateStudent);
+adminRouter.patch("/admin/update-student-data/:username", auth, updateStudent);
 adminRouter.delete("/admin/delete-student-data/:username", auth, deleteStudent);
 
 export { adminRouter };

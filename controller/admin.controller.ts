@@ -68,6 +68,7 @@ const getAllStudentData = async (req: Request, res: Response) => {
 const updateStudent = async (req: Request, res: Response) => {
   try {
     const data = req.body;
+    const username = req.params.username;
 
     if (!data.username) {
       responseModel.message = "Username not found!";
@@ -80,9 +81,20 @@ const updateStudent = async (req: Request, res: Response) => {
 
     data.password = generatePassword(data.firstname, data.mobile);
 
+    const findStudent = await studentModel.findOne({ username });
+
+    if (findStudent.username !== data.username) {
+      responseModel.message = "Username can't change!";
+      responseModel.status = false;
+      responseModel.data = [];
+
+      res.status(404).send(responseModel);
+      return;
+    }
+
     const stud: any = await studentModel.findOneAndUpdate(
       {
-        username: data.username,
+        username: username,
       },
       data
     );
