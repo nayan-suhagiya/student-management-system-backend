@@ -5,6 +5,7 @@ import dbconfig from "../db/dbconfig.config";
 //import router
 import { loginRouter } from "../router/login.router";
 import { adminRouter } from "../router/admin.router";
+import { studentRouter } from "../router/student.router";
 
 //config
 dbconfig();
@@ -18,6 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //Router declaration
 app.use(loginRouter);
 app.use(adminRouter);
+app.use(studentRouter);
 
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}`);

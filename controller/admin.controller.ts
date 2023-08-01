@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ResponseModel } from "../model/respose.model";
 import { studentModel } from "../model/student.model";
+import { noticeModel } from "../model/notice.model";
 
 let responseModel = new ResponseModel();
 
@@ -133,4 +134,50 @@ const deleteStudent = async (req: Request, res: Response) => {
   }
 };
 
-export { addStudent, getAllStudentData, updateStudent, deleteStudent };
+const addNotice = async (req: Request, res: Response) => {
+  try {
+    const data = req.body;
+    const notice = new noticeModel(data);
+
+    await notice.save();
+
+    responseModel.message = "Notice Added!";
+    responseModel.status = true;
+    responseModel.data = [];
+
+    res.status(200).send(responseModel);
+  } catch (error) {
+    responseModel.message = "Unable to add notice!";
+    responseModel.status = false;
+    responseModel.data = [{ error }];
+
+    res.status(400).send(responseModel);
+  }
+};
+
+const getNotice = async (req: Request, res: Response) => {
+  try {
+    const data = await noticeModel.find({});
+
+    responseModel.message = "Data fetched!";
+    responseModel.status = true;
+    responseModel.data = [data];
+
+    res.status(200).send(responseModel);
+  } catch (error) {
+    responseModel.message = "Unable to get notice!";
+    responseModel.status = false;
+    responseModel.data = [{ error }];
+
+    res.status(400).send(responseModel);
+  }
+};
+
+export {
+  addStudent,
+  getAllStudentData,
+  updateStudent,
+  deleteStudent,
+  addNotice,
+  getNotice,
+};
