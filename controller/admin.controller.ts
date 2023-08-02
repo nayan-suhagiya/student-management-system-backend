@@ -161,7 +161,7 @@ const getNotice = async (req: Request, res: Response) => {
 
     responseModel.message = "Data fetched!";
     responseModel.status = true;
-    responseModel.data = [data];
+    responseModel.data = data;
 
     res.status(200).send(responseModel);
   } catch (error) {
