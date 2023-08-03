@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ResponseModel } from "../model/respose.model";
 import { studentModel } from "../model/student.model";
 import { noticeModel } from "../model/notice.model";
+import { feesModel } from "../model/fees.model";
 
 let responseModel = new ResponseModel();
 
@@ -173,6 +174,67 @@ const getNotice = async (req: Request, res: Response) => {
   }
 };
 
+const addFees = async (req: Request, res: Response) => {
+  try {
+    // res.send(req.body);
+    const data = req.body;
+    const fees = new feesModel(data);
+
+    await fees.save();
+
+    responseModel.message = "Fees Added!";
+    responseModel.status = true;
+    responseModel.data = [];
+
+    res.status(200).send(responseModel);
+  } catch (error) {
+    responseModel.message = "Unable to add fees!";
+    responseModel.status = false;
+    responseModel.data = [{ error }];
+
+    res.status(400).send(responseModel);
+  }
+};
+
+const updateFees = async (req: Request, res: Response) => {
+  try {
+    const body = req.body;
+    const _id = req.query._id;
+
+    await feesModel.findByIdAndUpdate({ _id }, body);
+
+    responseModel.message = "Fees Updated!";
+    responseModel.status = true;
+    responseModel.data = [];
+
+    res.status(200).send(responseModel);
+  } catch (error) {
+    responseModel.message = "Unable to update fees!";
+    responseModel.status = false;
+    responseModel.data = [{ error }];
+
+    res.status(400).send(responseModel);
+  }
+};
+
+const getFees = async (req: Request, res: Response) => {
+  try {
+    const data = await feesModel.find({});
+
+    responseModel.message = "Fees Fetched!";
+    responseModel.status = true;
+    responseModel.data = data;
+
+    res.status(200).send(responseModel);
+  } catch (error) {
+    responseModel.message = "Unable to get fees!";
+    responseModel.status = false;
+    responseModel.data = [{ error }];
+
+    res.status(400).send(responseModel);
+  }
+};
+
 export {
   addStudent,
   getAllStudentData,
@@ -180,4 +242,7 @@ export {
   deleteStudent,
   addNotice,
   getNotice,
+  addFees,
+  updateFees,
+  getFees,
 };
