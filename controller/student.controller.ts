@@ -49,7 +49,10 @@ const getFeesDetails = async (req: Request, res: Response) => {
       return;
     }
 
-    const feesData = await studentFeesModel.findOne({ userId: req.query._id });
+    const feesData = await studentFeesModel.findOne(
+      { userId: req.query._id },
+      { _id: 0 }
+    );
 
     // console.log(feesData);
 
