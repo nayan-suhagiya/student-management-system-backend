@@ -201,7 +201,16 @@ const updateFees = async (req: Request, res: Response) => {
     const body = req.body;
     const _id = req.query._id;
 
-    await feesModel.findByIdAndUpdate({ _id }, body);
+    const data = {
+      tutionFees: Number(body.tutionFees),
+      labFees: Number(body.labFees),
+      campusDevelopmentFees: Number(body.campusDevelopmentFees),
+      libraryFees: Number(body.libraryFees),
+      otherFees: Number(body.otherFees),
+      totalFees: Number(body.totalFees),
+    };
+
+    await feesModel.findByIdAndUpdate({ _id }, data);
 
     responseModel.message = "Fees Updated!";
     responseModel.status = true;
